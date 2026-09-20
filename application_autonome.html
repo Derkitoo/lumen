@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Détachement.</title>
+    
+    <!-- Chargement de Tailwind CSS pour le design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chargement de React pour la logique -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Chargement de Babel pour lire le code React dans le navigateur -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Chargement des icônes Lucide (Vanilla) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { 
+            background-color: #020617; /* slate-950 */
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fade-in 0.4s ease-out forwards; }
+        .animate-fade-in-up { animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- EXTRACTION DES OUTILS ---
+        const { useState, useEffect, createElement } = React;
+        
+        // Configuration Lucide
+        // On récupère toutes les icônes de window.lucide
+        const LucideIcons = window.lucide;
+        
+        // Composant Wrapper pour utiliser Lucide avec React
+        const IconWrapper = ({ name, size = 24, className = '', ...props }) => {
+            const IconData = LucideIcons[name];
+            if (!IconData) return null;
+            
+            // Fonction utilitaire pour convertir les attributs SVG pour React (camelCase)
+            const camelCase = (str) => str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+            
+            const renderNode = (node, i) => {
+               if (typeof node === 'string') return node;
+               
+               // CORRECTION : Les données de Lucide Vanilla sont sous forme de tableau [tag, attrs, children]
+               const tag = node[0];
+               const attrs = node[1] || {};
+               const children = node[2] || [];
+               
+               const reactAttrs = { key: i };
+               
+               for (const key in attrs) {
+                   // Quelques attributs classiques qui doivent rester en string
+                   if (key === 'class') {
+                       reactAttrs.className = attrs[key];
+                   } else if (key === 'xmlns' || key === 'viewBox') {
+                       reactAttrs[key] = attrs[key];
+                   } else {
+                       reactAttrs[camelCase(key)] = attrs[key];
+                   }
+               }
+               
+               return createElement(
+                   tag, 
+                   reactAttrs, 
+                   children.map((child, index) => renderNode(child, index))
+               );
+            };
+
+            const defaultAttrs = {
+               xmlns: "http://www.w3.org/2000/svg",
+               width: size,
+               height: size,
+               viewBox: "0 0 24 24",
+               fill: "none",
+               stroke: "currentColor",
+               strokeWidth: "2",
+               strokeLinecap: "round",
+               strokeLinejoin: "round",
+               className: className,
+               ...props
+            };
+
+            return createElement(
+                'svg', 
+                defaultAttrs, 
+                IconData.map((node, i) => renderNode(node, i))
+            );
+        };
+        
+        // Création des composants d'icônes à partir du Wrapper
+        const Heart = (props) => <IconWrapper name="Heart" {...props} />;
+        const Activity = (props) => <IconWrapper name="Activity" {...props} />;
+        const Clock = (props) => <IconWrapper name="Clock" {...props} />;
+        const ShieldAlert = (props) => <IconWrapper name="ShieldAlert" {...props} />;
+        const ArrowLeft = (props) => <IconWrapper name="ArrowLeft" {...props} />;
+        const Check = (props) => <IconWrapper name="Check" {...props} />;
+        const Wind = (props) => <IconWrapper name="Wind" {...props} />;
+        const X = (props) => <IconWrapper name="X" {...props} />;
+        const MessageCircle = (props) => <IconWrapper name="MessageCircle" {...props} />;
+        const HeartCrack = (props) => <IconWrapper name="HeartCrack" {...props} />;
+        const Home = (props) => <IconWrapper name="Home" {...props} />;
+        const BookOpen = (props) => <IconWrapper name="BookOpen" {...props} />;
+        const Settings = (props) => <IconWrapper name="Settings" {...props} />;
+        const ChevronRight = (props) => <IconWrapper name="ChevronRight" {...props} />;
+        const Edit3 = (props) => <IconWrapper name="Edit3" {...props} />;
+        const Trash2 = (props) => <IconWrapper name="Trash2" {...props} />;
+        const BrainCircuit = (props) => <IconWrapper name="BrainCircuit" {...props} />;
+        const Lightbulb = (props) => <IconWrapper name="Lightbulb" {...props} />;
+        const Compass = (props) => <IconWrapper name="Compass" {...props} />;
+        const Calendar = (props) => <IconWrapper name="Calendar" {...props} />;
+        const Plus = (props) => <IconWrapper name="Plus" {...props} />;
+        const Smile = (props) => <IconWrapper name="Smile" {...props} />;
+        const Frown = (props) => <IconWrapper name="Frown" {...props} />;
+        const Meh = (props) => <IconWrapper name="Meh" {...props} />;
+        const Layers = (props) => <IconWrapper name="Layers" {...props} />;
+        const Waves = (props) => <IconWrapper name="Waves" {...props} />;
+        const Anchor = (props) => <IconWrapper name="Anchor" {...props} />;
+        const Target = (props) => <IconWrapper name="Target" {...props} />;
+        const Flame = (props) => <IconWrapper name="Flame" {...props} />;
+        const Droplets = (props) => <IconWrapper name="Droplets" {...props} />;
+        const CloudLightning = (props) => <IconWrapper name="CloudLightning" {...props} />;
+        const EyeOff = (props) => <IconWrapper name="EyeOff" {...props} />;
+        const Eye = (props) => <IconWrapper name="Eye" {...props} />;
+        const Search = (props) => <IconWrapper name="Search" {...props} />;
+        const Microscope = (props) => <IconWrapper name="Microscope" {...props} />;
+        const CheckCircle = (props) => <IconWrapper name="CheckCircle" {...props} />;
+
+
+        // Hook pour la persistance des données
+        function useLocalStorage(key, initialValue) {
+          const [storedValue, setStoredValue] = useState(() => {
+            try {
+              const item = window.localStorage.getItem(key);
+              return item ? JSON.parse(item) : initialValue;
+            } catch (error) {
+              return initialValue;
+            }
+          });
+
+          const setValue = (value) => {
+            try {
+              const valueToStore = value instanceof Function ? value(storedValue) : value;
+              setStoredValue(valueToStore);
+              window.localStorage.setItem(key, JSON.stringify(valueToStore));
+            } catch (error) {}
+          };
+          return [storedValue, setValue];
+        }
+
+        // --- DATA & SCENARIOS ---
+        const LIBRARY_CATEGORIES = [
+          {
+            id: 'neuro',
+            label: "Neurobiologie & Attachement",
+            icon: Activity,
+            articles: [
+              {
+                id: 'polyvagal',
+                title: "Pourquoi le silence blesse physiquement",
+                author: "Inspiré de Stephen Porges",
+                icon: Waves,
+                color: "text-rose-400",
+                bg: "bg-rose-500/10",
+                content: "L'anxiété que vous ressentez n'est pas 'dans votre tête', elle est dans votre système nerveux. Lorsqu'une figure d'attachement s'éloigne, votre système nerveux perçoit un danger de mort. Votre branche sympathique s'active (rythme cardiaque accéléré, besoin compulsif d'agir). Comprendre cela permet de déculpabiliser : votre corps fait simplement son travail de survie. La solution n'est pas de raisonner, mais de réguler le corps (respiration, froid, mouvement)."
+              },
+              {
+                id: 'attachement',
+                title: "La mécanique de l'Attachement Anxieux",
+                author: "Inspiré de John Bowlby",
+                icon: Heart,
+                color: "text-rose-400",
+                bg: "bg-rose-500/10",
+                content: "L'attachement anxieux se caractérise par un 'radar' hypersensible aux menaces de rejet. Une simple baisse de ton active le système de protestation. Le paradoxe ? L'anxieux cherche à se rassurer auprès de la source même de son angoisse. Le véritable détachement commence quand vous devenez votre propre figure d'attachement sécurisante."
+              }
+            ]
+          },
+          {
+            id: 'tcc',
+            label: "Thérapies TCC, ACT & TCD",
+            icon: BrainCircuit,
+            articles: [
+              {
+                id: 'distorsions',
+                title: "Les 3 Pièges de la Pensée",
+                author: "TCC - Aaron Beck",
+                icon: BrainCircuit,
+                color: "text-indigo-400",
+                bg: "bg-indigo-500/10",
+                content: "Votre souffrance vient souvent de 'distorsions cognitives'. 1. La lecture d'esprit : croire que l'on sait ce que l'autre pense. 2. La personnalisation : prendre personnellement des événements qui ne vous concernent pas. 3. Le catastrophisme : imaginer le pire scénario. Identifiez ces erreurs pour les neutraliser."
+              },
+              {
+                id: 'acceptation',
+                title: "L'Acceptation Radicale",
+                author: "TCD - Marsha Linehan",
+                icon: Anchor,
+                color: "text-indigo-400",
+                bg: "bg-indigo-500/10",
+                content: "La douleur est inévitable, mais la souffrance est optionnelle. La souffrance naît du refus de la réalité. L'acceptation radicale consiste à dire OUI à la réalité telle qu'elle est en cet instant précis. Accepter ne veut pas dire approuver, mais c'est la seule porte de sortie de la lutte intérieure."
+              }
+            ]
+          },
+          {
+            id: 'philo',
+            label: "Philosophies du Lâcher-Prise",
+            icon: Lightbulb,
+            articles: [
+              {
+                id: 'stoicisme',
+                title: "La Dichotomie du Contrôle",
+                author: "Stoïcisme - Épictète",
+                icon: Compass,
+                color: "text-teal-400",
+                bg: "bg-teal-500/10",
+                content: "Il y a des choses qui dépendent de nous (nos opinions, actions) et des choses qui ne dépendent pas de nous (les actions des autres). Tenter de contrôler ce qui ne dépend pas de nous mène à la frustration. Fixez votre énergie uniquement sur votre propre comportement."
+              },
+              {
+                id: 'adler',
+                title: "La Séparation des Tâches",
+                author: "Alfred Adler",
+                icon: Compass,
+                color: "text-teal-400",
+                bg: "bg-teal-500/10",
+                content: "Tous les problèmes interpersonnels proviennent d'une confusion des tâches. Exprimer vos sentiments est votre tâche. La façon dont l'autre réagit est SA tâche. N'interférez pas dans sa tâche, et ne le laissez pas interférer dans la vôtre."
+              }
+            ]
+          }
+        ];
+
+        const CRISIS_TYPES = {
+          WAITING: { id: 'WAITING', label: "Attente insoutenable", desc: "Anxiété liée au silence, besoin de réponses.", icon: Clock, color: "text-teal-400", bg: "bg-teal-500/10" },
+          COMPULSION: { id: 'COMPULSION', label: "Compulsion d'action", desc: "Envie d'écrire, de vérifier, de relancer.", icon: MessageCircle, color: "text-indigo-400", bg: "bg-indigo-500/10" },
+          REJECTION: { id: 'REJECTION', label: "Sentiment de rejet", desc: "Pensées intrusives, dévalorisation.", icon: HeartCrack, color: "text-rose-400", bg: "bg-rose-500/10" }
+        };
+
+        const EMOTIONS_DATA = {
+          ANGER: { 
+            id: 'ANGER', label: 'Colère', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10', border: 'border-orange-500/30', 
+            desc: 'Frustration, Injustice, Irritabilité', 
+            specifics: ['Frustration', 'Indignation', 'Trahison', 'Agacement'], 
+            needs: ['Respect', 'Équité', 'Être écouté(e)', 'Limites claires'] 
+          },
+          SADNESS: { 
+            id: 'SADNESS', label: 'Tristesse', icon: Droplets, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30',
+            desc: 'Solitude, Vide, Mélancolie', 
+            specifics: ['Solitude profonde', 'Vide intérieur', 'Sentiment de rejet'], 
+            needs: ['Réconfort', 'Soutien', 'Lien social authentique'] 
+          },
+          FEAR: { 
+            id: 'FEAR', label: 'Peur / Anxiété', icon: CloudLightning, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/30',
+            desc: 'Incertitude, Insécurité', 
+            specifics: ['Incertitude', 'Perte de contrôle', 'Insécurité affective', 'Panique'], 
+            needs: ['Sécurité', 'Clarté / Prévisibilité', 'Rassurance'] 
+          },
+          SHAME: { 
+            id: 'SHAME', label: 'Honte / Culpabilité', icon: EyeOff, color: 'text-stone-400', bg: 'bg-stone-500/10', border: 'border-stone-500/30',
+            desc: 'Dévalorisation, Imposteur', 
+            specifics: ['Dévalorisation de soi', 'Regret cuisant', 'Sentiment d\'humiliation'], 
+            needs: ['Empathie', 'Pardon', 'Droit à l\'erreur', 'Bienveillance'] 
+          }
+        };
+
+        const SOMATIC_SENSATIONS = [
+          "Gorge nouée / Boule dans la gorge", "Poitrine oppressée", "Ventre tendu / Nœud", 
+          "Mâchoire serrée", "Chaleur soudaine", "Lourdeur extrême", "Agitation / Tremblements"
+        ];
+
+        // --- UI COMPONENTS ---
+        const Button = ({ children, onClick, variant = 'primary', className = '', icon: Icon, disabled = false }) => {
+          const baseStyle = "w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-semibold transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed";
+          const variants = {
+            primary: "bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20",
+            danger: "bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/20",
+            outline: "border border-slate-600 bg-slate-800/50 hover:bg-slate-700 text-slate-200",
+            ghost: "bg-transparent hover:bg-slate-800/80 text-slate-400 hover:text-slate-200",
+            success: "bg-teal-600 hover:bg-teal-500 text-white shadow-lg shadow-teal-500/20"
+          };
+          return (
+            <button onClick={onClick} disabled={disabled} className={`${baseStyle} ${variants[variant]} ${className}`}>
+              {Icon && <Icon size={20} />}
+              {children}
+            </button>
+          );
+        };
+
+        const Card = ({ children, className = '', onClick }) => (
+          <div onClick={onClick} className={`bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 backdrop-blur-md shadow-xl ${onClick ? 'cursor-pointer hover:bg-slate-800/60 transition-colors' : ''} ${className}`}>
+            {children}
+          </div>
+        );
+
+        const Header = ({ title, subtitle, onBack, rightAction }) => (
+          <header className="flex items-center justify-between py-4 mb-4">
+            <div className="flex items-center gap-3">
+              {onBack && (
+                <button onClick={onBack} className="p-2.5 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">
+                  <ArrowLeft size={20} />
+                </button>
+              )}
+              <div>
+                <h1 className="text-xl font-bold text-slate-100 tracking-tight">{title}</h1>
+                {subtitle && <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>}
+              </div>
+            </div>
+            {rightAction && rightAction}
+          </header>
+        );
+
+        const Modal = ({ title, children, onClose }) => (
+          <div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+            <Card className="w-full max-w-sm border-slate-600 shadow-2xl animate-fade-in-up">
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-xl font-bold text-slate-100">{title}</h3>
+                <button onClick={onClose} className="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-700">
+                  <X size={24} />
+                </button>
+              </div>
+              {children}
+            </Card>
+          </div>
+        );
+
+        // --- VIEWS ---
+        const DashboardView = ({ onStartSOS, onMoodCheck, journal }) => {
+          const [showCrisisSelector, setShowCrisisSelector] = useState(false);
+          const todayStr = new Date().toDateString();
+          const hasCheckedInToday = journal.some(entry => entry.type === 'mood' && new Date(entry.date).toDateString() === todayStr);
+
+          return (
+            <div className="flex flex-col h-full animate-fade-in pb-20 overflow-y-auto hide-scrollbar">
+              <header className="py-6 mb-2">
+                <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-teal-400 bg-clip-text text-transparent">
+                  Détachement.
+                </h1>
+                <p className="text-slate-400 mt-1 text-sm font-medium">Reprenez le contrôle de votre esprit.</p>
+              </header>
+
+              <div className="flex-1 flex flex-col gap-6">
+                {!hasCheckedInToday && (
+                  <Card className="border-slate-700 bg-slate-800/60">
+                    <h3 className="text-sm font-semibold text-slate-200 mb-4 text-center">Comment vous sentez-vous ?</h3>
+                    <div className="flex justify-around gap-2">
+                      <button onClick={() => onMoodCheck('good')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-teal-500/10 text-slate-400 hover:text-teal-400"><Smile size={32} /><span className="text-xs">Serein(e)</span></button>
+                      <button onClick={() => onMoodCheck('neutral')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-amber-500/10 text-slate-400 hover:text-amber-400"><Meh size={32} /><span className="text-xs">Instable</span></button>
+                      <button onClick={() => onMoodCheck('bad')} className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-rose-500/10 text-slate-400 hover:text-rose-400"><Frown size={32} /><span className="text-xs">Anxieux</span></button>
+                    </div>
+                  </Card>
+                )}
+
+                <div className="relative group mt-2">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                  <Card className="relative text-center border-indigo-500/20 bg-slate-900/80 shadow-none">
+                    <div className="w-14 h-14 mx-auto bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mb-3 border border-indigo-500/30">
+                      <Microscope size={28} />
+                    </div>
+                    <h2 className="text-xl font-bold text-slate-100 mb-2">Laboratoire Émotionnel</h2>
+                    <p className="text-slate-400 text-xs mb-5 leading-relaxed px-4">
+                      Décortiquez une émotion lourde à la racine pour vous en détacher consciemment.
+                    </p>
+                    <Button variant="primary" onClick={() => onStartSOS('emotion_analyzer')} className="py-3">
+                      Démarrer l'analyse
+                    </Button>
+                  </Card>
+                </div>
+
+                <Card onClick={() => setShowCrisisSelector(true)} className="border-rose-500/30 bg-slate-800/80 group cursor-pointer hover:bg-slate-800">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-rose-500/10 text-rose-400 rounded-xl group-hover:scale-110 transition-transform border border-rose-500/20">
+                      <ShieldAlert size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-slate-200 font-bold mb-0.5 text-sm">Crise d'anxiété ?</h3>
+                      <p className="text-slate-400 text-xs leading-snug">Panique, rumination ou compulsion d'agir.</p>
+                    </div>
+                    <ChevronRight size={18} className="text-slate-600 group-hover:text-rose-400" />
+                  </div>
+                </Card>
+              </div>
+
+              {showCrisisSelector && (
+                <Modal title="Que ressentez-vous ?" onClose={() => setShowCrisisSelector(false)}>
+                  <div className="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1">
+                    {Object.values(CRISIS_TYPES).map((crisis) => (
+                      <button
+                        key={crisis.id}
+                        onClick={() => { setShowCrisisSelector(false); onStartSOS(crisis.id); }}
+                        className="w-full text-left p-4 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-indigo-500/50 flex items-center gap-4 group"
+                      >
+                        <div className={`p-3 rounded-lg ${crisis.bg} ${crisis.color}`}><crisis.icon size={24} /></div>
+                        <div className="flex-1">
+                          <h4 className="text-slate-200 font-semibold text-sm">{crisis.label}</h4>
+                          <p className="text-slate-500 text-xs mt-0.5">{crisis.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </Modal>
+              )}
+            </div>
+          );
+        };
+
+        const LibraryView = () => {
+          const [selectedArticle, setSelectedArticle] = useState(null);
+          const [activeCategory, setActiveCategory] = useState(LIBRARY_CATEGORIES[0].id);
+          const currentCat = LIBRARY_CATEGORIES.find(c => c.id === activeCategory);
+
+          return (
+            <div className="flex flex-col h-full animate-fade-in pb-24 overflow-y-auto hide-scrollbar">
+              <Header title="Expertise" subtitle="Bases scientifiques et philosophiques" />
+              {!selectedArticle ? (
+                <>
+                  <div className="flex flex-wrap gap-2 mb-6 w-full">
+                    {LIBRARY_CATEGORIES.map(cat => (
+                      <button
+                        key={cat.id} onClick={() => setActiveCategory(cat.id)}
+                        className={`flex-auto flex items-center justify-center gap-2 px-3 py-3 rounded-xl border ${activeCategory === cat.id ? 'bg-indigo-600 border-indigo-500 text-white' : 'bg-slate-800/60 border-slate-700/50 text-slate-400'}`}
+                      >
+                        <cat.icon size={16} className="flex-shrink-0" />
+                        <span className="text-[11px] sm:text-xs font-bold whitespace-normal text-center">{cat.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {currentCat.articles.map((item) => (
+                      <Card key={item.id} onClick={() => setSelectedArticle(item)} className="flex items-start gap-4 p-5">
+                        <div className={`p-3 rounded-xl ${item.bg} ${item.color} flex-shrink-0`}><item.icon size={24} /></div>
+                        <div>
+                          <h3 className="text-slate-200 font-bold mb-1 text-sm">{item.title}</h3>
+                          <p className="text-indigo-400/80 text-[10px] font-bold uppercase mb-2">{item.author}</p>
+                          <p className="text-slate-400 text-xs line-clamp-2">{item.content}</p>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div>
+                  <button onClick={() => setSelectedArticle(null)} className="flex items-center gap-2 text-indigo-400 text-sm font-semibold mb-6 px-4 py-2 bg-indigo-500/10 rounded-full"><ArrowLeft size={16} /> Retour</button>
+                  <div className={`inline-flex p-4 rounded-2xl ${selectedArticle.bg} ${selectedArticle.color} mb-6`}><selectedArticle.icon size={32} /></div>
+                  <h2 className="text-2xl font-extrabold text-slate-100 mb-2">{selectedArticle.title}</h2>
+                  <p className="text-slate-400 font-medium text-xs tracking-wide uppercase mb-8">{selectedArticle.author}</p>
+                  <div className="text-slate-300 leading-relaxed bg-slate-800/40 p-6 rounded-3xl border border-slate-700/50 text-sm">
+                    {selectedArticle.content}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const JournalView = ({ journal, clearJournal }) => {
+          return (
+            <div className="flex flex-col h-full animate-fade-in pb-24 overflow-y-auto hide-scrollbar">
+              <Header title="Mon Espace" subtitle="Suivi de vos progrès" />
+              {journal.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50 px-4">
+                  <Calendar size={48} className="text-slate-600 mb-4" />
+                  <p className="text-slate-400 text-sm">Votre journal est vide.</p>
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col gap-4 mt-2">
+                  <div className="flex justify-end mb-1">
+                     <button onClick={clearJournal} className="text-xs text-rose-400/70 hover:text-rose-400 flex items-center gap-1"><Trash2 size={12}/> Effacer l'historique</button>
+                  </div>
+                  {journal.map((entry, i) => {
+                    if (entry.type === 'emotion_analysis') {
+                      const family = EMOTIONS_DATA[entry.analysis.familyId] || EMOTIONS_DATA.FEAR;
+                      const Icon = family.icon;
+                      return (
+                        <Card key={i} className={`py-4 border-l-4 ${family.border}`}>
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className={`p-1.5 rounded-lg ${family.bg} ${family.color}`}><Icon size={14} /></div>
+                              <span className="font-bold text-slate-200 text-sm">Autopsie : {family.label}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-500 font-mono">{new Date(entry.date).toLocaleDateString('fr-FR')}</span>
+                          </div>
+                          <div className="space-y-2 bg-slate-900/50 p-3 rounded-xl border border-slate-700/50">
+                            <p className="text-xs text-slate-300"><span className="text-slate-500">Ressenti exact :</span> {entry.analysis.specific}</p>
+                            <p className="text-xs text-slate-300"><span className="text-slate-500">Besoin racine :</span> <span className="font-semibold text-indigo-400">{entry.analysis.need}</span></p>
+                            <div className="h-px w-full bg-slate-700/50 my-1" />
+                            <p className="text-xs text-slate-300 italic">Action : "{entry.analysis.action}"</p>
+                          </div>
+                        </Card>
+                      );
+                    }
+                    if (entry.type === 'mood') {
+                      const moodConfig = { good: { icon: Smile, color: 'text-teal-400', label: 'Serein' }, neutral: { icon: Meh, color: 'text-amber-400', label: 'Instable' }, bad: { icon: Frown, color: 'text-rose-400', label: 'Anxieux' } };
+                      const cfg = moodConfig[entry.mood] || moodConfig.neutral;
+                      const Icon = cfg.icon;
+                      return (
+                        <Card key={i} className="py-3 border border-slate-700/50 bg-slate-800/20">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-3"><Icon size={20} className={cfg.color} /><span className="font-medium text-slate-300 text-sm">{cfg.label}</span></div>
+                            <span className="text-[10px] text-slate-500 font-mono">{new Date(entry.date).toLocaleDateString('fr-FR')}</span>
+                          </div>
+                        </Card>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const EmotionAnalyzerFlow = ({ onComplete, onCancel }) => {
+          const [step, setStep] = useState(1);
+          const [analysis, setAnalysis] = useState({ familyId: null, specific: null, somatic: null, need: null, action: '' });
+          const currentFamily = analysis.familyId ? EMOTIONS_DATA[analysis.familyId] : null;
+          const handleNext = (key, value) => { setAnalysis(prev => ({ ...prev, [key]: value })); setStep(prev => prev + 1); };
+
+          return (
+            <div className="flex flex-col h-full animate-fade-in bg-slate-900 relative z-10 pb-8 overflow-y-auto">
+              <Header title="Le Laboratoire" subtitle={`Étape ${step}/5`} onBack={step > 1 ? () => setStep(step - 1) : onCancel} />
+              
+              <div className="flex gap-1 mb-6 px-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className={`h-1.5 rounded-full flex-1 transition-all duration-300 ${i === step ? (currentFamily ? currentFamily.bg.replace('/10', '') : 'bg-indigo-500') : i < step ? 'bg-slate-700' : 'bg-slate-800'}`} />
+                ))}
+              </div>
+
+              <div className="flex-1 flex flex-col">
+                {step === 1 && (
+                  <>
+                    <h2 className="text-xl font-bold text-slate-100 mb-6">Que ressentez-vous globalement ?</h2>
+                    <div className="grid grid-cols-1 gap-3">
+                      {Object.values(EMOTIONS_DATA).map(family => (
+                        <Card key={family.id} onClick={() => handleNext('familyId', family.id)} className="flex items-center gap-4 p-4">
+                          <div className={`p-3 rounded-xl ${family.bg} ${family.color}`}><family.icon size={24} /></div>
+                          <div><h3 className="text-slate-200 font-bold text-sm">{family.label}</h3><p className="text-slate-500 text-xs mt-0.5">{family.desc}</p></div>
+                        </Card>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {step === 2 && currentFamily && (
+                  <>
+                    <h2 className="text-xl font-bold text-slate-100 mb-6">Soyons plus précis.</h2>
+                    <div className="flex flex-col gap-3">
+                      {currentFamily.specifics.map((spec, idx) => (
+                        <Button key={idx} variant="outline" onClick={() => handleNext('specific', spec)} className="py-4 justify-start text-left pl-6 text-sm">{spec}</Button>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {step === 3 && currentFamily && (
+                  <>
+                    <h2 className="text-xl font-bold text-slate-100 mb-6">Où se loge cette émotion ?</h2>
+                    <div className="grid grid-cols-2 gap-3">
+                      {SOMATIC_SENSATIONS.map((sens, idx) => (
+                        <button key={idx} onClick={() => handleNext('somatic', sens)} className="bg-slate-800/50 border border-slate-700 p-4 rounded-xl text-xs font-medium text-slate-300 text-left hover:bg-slate-700/50">{sens}</button>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {step === 4 && currentFamily && (
+                  <>
+                    <h2 className="text-xl font-bold text-slate-100 mb-6">Quel est votre besoin profond ?</h2>
+                    <div className="flex flex-col gap-3">
+                      {currentFamily.needs.map((need, idx) => (
+                        <Button key={idx} variant="outline" onClick={() => handleNext('need', need)} className="py-4 justify-between px-6 text-sm">
+                          <span>Besoin de <strong className="text-indigo-400 ml-1">{need}</strong></span><ChevronRight size={16} className="text-slate-600" />
+                        </Button>
+                      ))}
+                    </div>
+                  </>
+                )}
+                {step === 5 && currentFamily && (
+                  <div className="flex flex-col h-full">
+                    <h2 className="text-xl font-bold text-slate-100 mb-4">La Dichotomie du Contrôle</h2>
+                    <p className="text-slate-400 text-sm mb-4">Que pouvez-vous faire <span className="underline decoration-teal-500">vous-même</span> aujourd'hui pour nourrir ce besoin ?</p>
+                    <textarea value={analysis.action} onChange={(e) => setAnalysis(prev => ({ ...prev, action: e.target.value }))} placeholder="Ex: Prendre soin de moi, écrire, accepter..." className="w-full flex-1 min-h-[120px] bg-slate-900 border border-slate-700 rounded-xl p-4 text-slate-200 text-sm focus:outline-none mb-6 resize-none" />
+                    <Button onClick={() => analysis.action.trim() && onComplete(analysis)} disabled={!analysis.action.trim()} variant="success" className="py-4 mt-auto">Valider et terminer</Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+          const [journal, setJournal] = useLocalStorage('sos-detachement-v3', []);
+          const [currentTab, setCurrentTab] = useState('home');
+          const [activeFlow, setActiveFlow] = useState(null);
+
+          const startSOSFlow = (crisisId) => setActiveFlow('emotion_analyzer');
+
+          return (
+            <div className="min-h-screen flex justify-center bg-black">
+              <main className="w-full max-w-md bg-slate-950 relative flex flex-col h-[100dvh] overflow-hidden">
+                <div className="flex-1 px-5 pt-6 pb-0 relative overflow-hidden">
+                  {!activeFlow ? (
+                    <>
+                      {currentTab === 'home' && <DashboardView onStartSOS={startSOSFlow} onMoodCheck={(mood) => setJournal([{ id: Date.now(), type: 'mood', date: new Date().toISOString(), mood }, ...journal])} journal={journal} />}
+                      {currentTab === 'library' && <LibraryView />}
+                      {currentTab === 'journal' && <JournalView journal={journal} clearJournal={() => setJournal([])} />}
+                    </>
+                  ) : (
+                    <EmotionAnalyzerFlow 
+                      onComplete={(analysis) => { setJournal([{ id: Date.now(), type: 'emotion_analysis', date: new Date().toISOString(), analysis }, ...journal]); setActiveFlow(null); }} 
+                      onCancel={() => setActiveFlow(null)} 
+                    />
+                  )}
+                </div>
+
+                {!activeFlow && (
+                  <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 bg-gradient-to-t from-slate-950 via-slate-950 to-transparent z-40">
+                    <div className="flex justify-between items-center bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-2 shadow-2xl">
+                      {[
+                        { id: 'home', icon: Home, label: "Accueil" },
+                        { id: 'library', icon: BookOpen, label: "Comprendre" },
+                        { id: 'journal', icon: Calendar, label: "Espace" }
+                      ].map(tab => (
+                        <button key={tab.id} onClick={() => setCurrentTab(tab.id)} className={`flex flex-col items-center gap-1 p-2 flex-1 rounded-xl transition-all duration-300 ${currentTab === tab.id ? 'text-indigo-400 bg-indigo-500/10' : 'text-slate-500'}`}>
+                          <tab.icon size={20} />
+                          <span className="text-[9px] font-semibold uppercase tracking-wider">{tab.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </main>
+            </div>
+          );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
