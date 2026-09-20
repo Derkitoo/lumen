@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Balises PWA (Progressive Web App) -->
+    <meta name="theme-color" content="#020617">
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Optimisation pour iOS (iPhone/iPad) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Détachement">
+    <link rel="apple-touch-icon" href="https://api.iconify.design/lucide/anchor.svg?color=white&width=192&height=192">
+    
     <title>Détachement.</title>
     
     <!-- Chargement de Tailwind CSS pour le design -->
@@ -646,6 +657,21 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
+    </script>
+
+    <!-- Script d'enregistrement de la PWA -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+              console.log('PWA activée ! Service Worker enregistré avec succès.', registration.scope);
+            })
+            .catch(error => {
+              console.error('Erreur lors de l\'enregistrement de la PWA:', error);
+            });
+        });
+      }
     </script>
 </body>
 </html>
